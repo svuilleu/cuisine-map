@@ -1,13 +1,32 @@
 {
+  "BR": [
+    {
+      "name": "Feijoada",
+      "description": "Ragoût de haricots noirs et de viande, servi avec du riz.",
+      "images": ["br-feijoada.jpg"],
+      "tags": [
+        "haricots",
+        "viande"
+      ]
+    }
+  ],
   "FR": [
     {
-      "name": "Bouillabaisse",
-      "description": "Soupe de poissons de Marseille.",
-      "images": [
-        "images/fr-bouillabaisse.jpg"
-      ],
+      "name": "Crêpes",
+      "description": "Fine pâte dorée, sucré/salé.",
+      "images": ["fr-crepes.jpg"],
       "tags": [
-        "poisson"
+        "sucré",
+        "salé"
+      ]
+    },
+   {
+      "name": "Bouillabaisse",
+      "description": "Soupe de poisson provençale.",
+      "images": ["fr-bouillabaisse.jpg"],
+      "tags": [
+        "poisson",
+        "soupe"
       ]
     }
   ],
@@ -15,9 +34,7 @@
     {
       "name": "Ramen",
       "description": "Nouilles dans un bouillon riche.",
-      "images": [
-        "images/jp-ramen.jpg"
-      ],
+      "images": ["jp-ramen.jpg"],
       "tags": [
         "nouilles"
       ]

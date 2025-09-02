@@ -22,40 +22,56 @@ async function injectSVG(url, mount){
 }
 
 function buildIsoSet() {
-  return new Set(Object.keys(state.codeToName).map(k => k.toUpperCase()));
+  const iso = new Set(Object.keys(state.codeToName).map(k => k.toUpperCase()));
+  // fallback minimal set in case countries.json failed for some reason
+  ['FR','JP','BR','US','GB','DE','IT','ES','CN','IN','CA','AU','AR','MX','EG'].forEach(c=>iso.add(c));
+  return iso;
 }
 
-/** Try to extract ISO2 code from a node's id/class/data attributes */
+/** Extract ISO2 code from id/class/data attributes, with permissive fallback */
 function getIsoFromNode(node, isoSet) {
-  // id first
-  if (node.id) {
-    const cand = node.id.trim().toUpperCase();
-    if (isoSet.has(cand)) return cand;
-    // Some maps prefix/suffix ids, try to extract 2-letter token
-    const m = cand.match(/(^|[^A-Z])([A-Z]{2})(?![A-Z])/);
-    if (m && isoSet.has(m[2])) return m[2];
+  const tryCode = (val) => {
+    if(!val) return null;
+    const cand = val.trim();
+    if (/^[A-Za-z]{2}$/.test(cand)) return cand.toUpperCase();
+    const m = cand.toUpperCase().match(/(^|[^A-Z])([A-Z]{2})(?![A-Z])/);
+    return m ? m[2] : null;
+  };
+
+  // 1) direct id
+  let code = tryCode(node.id);
+  if (code && (isoSet.has(code))) return code;
+
+  // 2) data-* commonly used
+  for(const k of ['data-id','data-iso2','data-cc','data-iso','data-code']){
+    code = tryCode(node.getAttribute?.(k));
+    if (code && (isoSet.has(code) || /^[A-Z]{2}$/.test(code))) return code;
   }
-  // data-iso2 / data-cc / data-iso
-  const d = node.getAttribute && (node.getAttribute('data-iso2') || node.getAttribute('data-cc') || node.getAttribute('data-iso'));
-  if (d) {
-    const cand = d.trim().toUpperCase();
-    if (isoSet.has(cand)) return cand;
+
+  // 3) classes
+  const cls = node.getAttribute?.('class') || '';
+  for (const c of cls.split(/\s+/)) {
+    code = tryCode(c);
+    if (code && (isoSet.has(code) || /^[A-Z]{2}$/.test(code))) return code;
   }
-  // class names
-  const cls = (node.getAttribute && node.getAttribute('class')) || '';
-  if (cls) {
-    for (const c of cls.split(/\s+/)) {
-      const up = c.trim().toUpperCase();
-      if (isoSet.has(up)) return up;
-      if (/^[A-Z]{2}$/.test(up) && isoSet.has(up)) return up;
-    }
-  }
+
   return null;
 }
 
 function countryDisplayName(code){
   const fromMap = state.codeToName[code];
   return fromMap || code;
+}
+
+// normalize image URL: allow bare filename, relative 'images/..', absolute, or http(s)
+function normalizeImage(src){
+  if (!src) return null;
+  const s = String(src).trim();
+  if (/^(https?:)?\/\//i.test(s)) return s;             // http(s)
+  if (/^data:/i.test(s)) return s;                         // data URI
+  if (s.startsWith('/images/') || s.startsWith('images/')) return s.replace(/^\/+/,''); // keep as is
+  if (s.startsWith('/')) return s;                         // other absolute
+  return 'images/' + s;                                    // bare filename -> images/<name>
 }
 
 // Render details panel
@@ -67,9 +83,7 @@ function renderCountry(code){
     container.innerHTML = `
       <div class="placeholder">
         <div class="country-header">
-          <div class="country-title">
-            <h2>${countryDisplayName(code)}</h2>
-          </div>
+          <div class="country-title"><h2>${countryDisplayName(code)}</h2></div>
           <button class="reset" id="btn-reset">Réinitialiser</button>
         </div>
         <p>Aucun plat enregistré pour ce pays pour l’instant.</p>
@@ -82,12 +96,15 @@ function renderCountry(code){
 
   const cards = dishes.map((d)=>{
     const tags = (d.tags||[]).map(t=>`<span class="tag">${t}</span>`).join(' ');
-    const gallery = (d.images||[]).map(src=>`<img class="thumb" loading="lazy" src="${src}" alt="${d.name}">`).join('');
+    const gallery = (d.images||[]).map(s=>{
+      const url = normalizeImage(s);
+      return url ? `<img class="thumb" loading="lazy" src="${url}" alt="${d.name}">` : '';
+    }).join('');
     return `
       <article class="card">
         <h3>${d.name}</h3>
         ${d.description ? `<p>${d.description}</p>` : ""}
-        ${d.images?.length ? `<div class="grid grid-3" style="margin-top:8px">${gallery}</div>` : ""}
+        ${gallery ? `<div class="grid grid-3" style="margin-top:8px">${gallery}</div>` : ""}
         ${d.tags?.length ? `<div style="margin-top:8px">${tags}</div>` : ""}
       </article>
     `;
@@ -95,9 +112,7 @@ function renderCountry(code){
 
   container.innerHTML = `
     <div class="country-header">
-      <div class="country-title">
-        <h2>${countryDisplayName(code)}</h2>
-      </div>
+      <div class="country-title"><h2>${countryDisplayName(code)}</h2></div>
       <button class="reset" id="btn-reset">Réinitialiser</button>
     </div>
     <div style="margin-top:8px">${cards}</div>
@@ -120,26 +135,31 @@ function wireCountryClicks(svg){
   const isoSet = buildIsoSet();
 
   // Disable pointer events on obvious non-country layers that may block clicks
-  const blockers = ['ocean','water','graticule','borders','land','landxx','oceanxx'];
-  blockers.forEach(id => {
+  ['ocean','water','graticule','borders','land','landxx','oceanxx'].forEach(id => {
     const n = svg.getElementById(id);
     if (n) n.style.pointerEvents = 'none';
   });
 
-  // Collect potential country nodes: any element with an id/class that maps to ISO2
-  const nodesWithId = els('[id]', svg);
-  const nodesWithClass = els('[class]', svg);
-  const candidates = new Set([...nodesWithId, ...nodesWithClass]);
+  // Candidate nodes: anything with id, class or data-* that could carry the code
+  const candidates = new Set([
+    ...els('[id]', svg),
+    ...els('[class]', svg),
+    ...els('[data-id]', svg),
+    ...els('[data-iso2]', svg),
+    ...els('[data-cc]', svg),
+    ...els('[data-iso]', svg),
+    ...els('[data-code]', svg)
+  ]);
 
-  const clickable = [];
-  const seenKeys = new Set();
+  const seen = new Set();
 
   candidates.forEach(node => {
     const iso = getIsoFromNode(node, isoSet);
-    if (!iso) return;
-    // Prefer grouping elements (<g>) when available to capture all subpaths
+    if (!iso || !/^[A-Z]{2}$/.test(iso)) return;
+
+    // Climb to a grouping <g> to make the whole country clickable
     let target = node;
-    if (node.tagName.toLowerCase() !== 'g') {
+    if (node.tagName && node.tagName.toLowerCase() !== 'g') {
       let p = node.parentElement;
       while (p && p.tagName && p.tagName.toLowerCase() !== 'svg') {
         const pIso = getIsoFromNode(p, isoSet);
@@ -147,27 +167,32 @@ function wireCountryClicks(svg){
         p = p.parentElement;
       }
     }
+
     const key = iso + '|' + (target.getAttribute('id') || target.tagName + '|' + target.outerHTML.length);
-    if (seenKeys.has(key)) return;
-    seenKeys.add(key);
+    if (seen.has(key)) return;
+    seen.add(key);
 
     target.style.cursor = 'pointer';
+    // ensure children receive pointer events
     els('*', target).forEach(ch => { if (!ch.style.pointerEvents) ch.style.pointerEvents = 'auto'; });
-    target.addEventListener('mouseenter', () => target.dataset._oldFill = target.getAttribute('fill'));
+
     target.addEventListener('click', (ev) => {
       ev.stopPropagation();
       renderCountry(iso);
-      target.setAttribute('fill', '#34d399');
+      // simple outline flash without changing fill
+      const prevStroke = target.getAttribute('stroke');
+      const prevStrokeW = target.getAttribute('stroke-width');
+      target.setAttribute('stroke', '#34d399');
+      target.setAttribute('stroke-width', '2');
       setTimeout(()=>{
-        if(target.dataset._oldFill) target.setAttribute('fill', target.dataset._oldFill);
-        else target.removeAttribute('fill');
+        if(prevStroke !== null) target.setAttribute('stroke', prevStroke); else target.removeAttribute('stroke');
+        if(prevStrokeW !== null) target.setAttribute('stroke-width', prevStrokeW); else target.removeAttribute('stroke-width');
       }, 220);
     });
 
-    // Tint if data exists
+    // Mark countries that have data (CSS outlines them)
     if(state.data[iso]?.length){
       target.setAttribute('data-has-data', 'true');
-      if(!target.getAttribute('fill')) target.setAttribute('fill', '#0b3b48');
     }
   });
 }

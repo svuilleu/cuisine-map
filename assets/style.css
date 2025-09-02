@@ -5,10 +5,13 @@
   --muted:#94a3b8;
   --text:#e5e7eb;
   --accent:#38bdf8;
-  --accent-2:#34d399;
+  --accent-2:#f4d399;
   --warn:#f59e0b;
   --danger:#ef4444;
   --border:#1f2937;
+								
+  --land-color: #9db5dd;    /* couleur de base des pays */
+  --land-stroke: #0f172a;   /* contour fin des pays */
 }
 html,body{height:100%}
 body{
@@ -34,16 +37,36 @@ body{
 .details-panel .placeholder{color:var(--muted)}
 .details-panel h2{margin-top:8px}
 .country-header{display:flex; align-items:center; justify-content:space-between; gap:8px}
-.country-title{display:flex; align-items:center; gap:8px}
-.country-flag{width:24px; height:16px; border-radius:3px; object-fit:cover; border:1px solid var(--border)}
 .card{border:1px solid var(--border);border-radius:14px;padding:12px;margin-top:12px;background:rgba(17,24,39,0.55)}
 .card h3{margin:0 0 6px 0}
 .card p{margin:0; color:var(--text)}
 .grid{display:grid; gap:12px}
-.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .thumb{width:100%; aspect-ratio: 4/3; object-fit:cover; border-radius:10px; border:1px solid var(--border); background:#0b1022}
 .tag{display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid var(--border); color:var(--muted)}
 button.reset{border:1px solid var(--border); background:transparent; color:var(--muted); border-radius:10px; padding:8px 10px; cursor:pointer;}
 button.reset:hover{border-color:#334155; color:#cbd5e1}
-@media (max-width: 900px){.layout{grid-template-columns: 1fr}#map-container{height:420px}}
+
+/* applique une couleur par défaut à tous les pays du SVG */
+#map-container svg path{
+  fill: var(--land-color);
+}
+
+/* pays qui ONT des plats: contour discret (pas de remplissage foncé) */
+#map-container [data-has-data="true"],
+#map-container [data-has-data="true"] path{
+  /*stroke: #f4d399;
+  stroke-width: 1.4;*/
+  fill: var(--accent-2);
+}
+
+@media (max-width: 900px){
+  .layout{grid-template-columns: 1fr}
+  #map-container{height:420px}
+}
+
+
+
+
+
+

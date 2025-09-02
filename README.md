@@ -3,7 +3,7 @@
 Projet minimal pour afficher des **plats traditionnels par pays** via une **carte SVG cliquable**.
 Tout est **statique** : fichiers HTML/CSS/JS + `data/dishes.json` pour les données + images.
 
-## Lancer en local
+## Lancer en local (deux possibilités)
 - Ouvrir `index.html` dans un navigateur **via un petit serveur** (important pour `fetch()`):
   - Python : `python3 -m http.server` puis ouvre http://localhost:8000
   - Node : `npx serve .`
@@ -19,7 +19,7 @@ Tout est **statique** : fichiers HTML/CSS/JS + `data/dishes.json` pour les donn�
 /images
   (tes images ici)
 /public
-  world-simple.svg       # remplace par une vraie carte ISO-2
+  world-simple.svg
 index.html
 ```
 
