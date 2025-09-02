@@ -17,8 +17,40 @@ async function injectSVG(url, mount){
   const text = await (await fetch(url)).text();
   mount.innerHTML = text;
   const svg = mount.querySelector('svg');
-  svg?.setAttribute('focusable','false'); // a11y
+  if(svg){ svg.setAttribute('preserveAspectRatio','xMidYMid meet'); svg.style.width='100%'; svg.style.height='100%'; }
   return svg;
+}
+
+function buildIsoSet() {
+  return new Set(Object.keys(state.codeToName).map(k => k.toUpperCase()));
+}
+
+/** Try to extract ISO2 code from a node's id/class/data attributes */
+function getIsoFromNode(node, isoSet) {
+  // id first
+  if (node.id) {
+    const cand = node.id.trim().toUpperCase();
+    if (isoSet.has(cand)) return cand;
+    // Some maps prefix/suffix ids, try to extract 2-letter token
+    const m = cand.match(/(^|[^A-Z])([A-Z]{2})(?![A-Z])/);
+    if (m && isoSet.has(m[2])) return m[2];
+  }
+  // data-iso2 / data-cc / data-iso
+  const d = node.getAttribute && (node.getAttribute('data-iso2') || node.getAttribute('data-cc') || node.getAttribute('data-iso'));
+  if (d) {
+    const cand = d.trim().toUpperCase();
+    if (isoSet.has(cand)) return cand;
+  }
+  // class names
+  const cls = (node.getAttribute && node.getAttribute('class')) || '';
+  if (cls) {
+    for (const c of cls.split(/\s+/)) {
+      const up = c.trim().toUpperCase();
+      if (isoSet.has(up)) return up;
+      if (/^[A-Z]{2}$/.test(up) && isoSet.has(up)) return up;
+    }
+  }
+  return null;
 }
 
 function countryDisplayName(code){
@@ -85,34 +117,57 @@ function resetDetails(){
 }
 
 function wireCountryClicks(svg){
-  // Use any element with an id that looks like an ISO2 code (A–Z)
-  const clickable = els('[id]', svg).filter(n => /^[A-Z]{2}$/.test(n.id));
+  const isoSet = buildIsoSet();
 
-  // Fill mapping from <title> of each path/group if present
-  clickable.forEach(node => {
-    const title = node.querySelector('title')?.textContent?.trim();
-    if(title) state.codeToName[node.id] = title;
+  // Disable pointer events on obvious non-country layers that may block clicks
+  const blockers = ['ocean','water','graticule','borders','land','landxx','oceanxx'];
+  blockers.forEach(id => {
+    const n = svg.getElementById(id);
+    if (n) n.style.pointerEvents = 'none';
   });
 
-  clickable.forEach(node => {
-    node.style.cursor = 'pointer';
-    node.addEventListener('mouseenter', () => node.dataset._oldFill = node.getAttribute('fill'));
-    node.addEventListener('click', () => {
-      renderCountry(node.id);
-      // flash selection feedback
-      node.setAttribute('fill', '#34d399');
+  // Collect potential country nodes: any element with an id/class that maps to ISO2
+  const nodesWithId = els('[id]', svg);
+  const nodesWithClass = els('[class]', svg);
+  const candidates = new Set([...nodesWithId, ...nodesWithClass]);
+
+  const clickable = [];
+  const seenKeys = new Set();
+
+  candidates.forEach(node => {
+    const iso = getIsoFromNode(node, isoSet);
+    if (!iso) return;
+    // Prefer grouping elements (<g>) when available to capture all subpaths
+    let target = node;
+    if (node.tagName.toLowerCase() !== 'g') {
+      let p = node.parentElement;
+      while (p && p.tagName && p.tagName.toLowerCase() !== 'svg') {
+        const pIso = getIsoFromNode(p, isoSet);
+        if (pIso === iso){ target = p; break; }
+        p = p.parentElement;
+      }
+    }
+    const key = iso + '|' + (target.getAttribute('id') || target.tagName + '|' + target.outerHTML.length);
+    if (seenKeys.has(key)) return;
+    seenKeys.add(key);
+
+    target.style.cursor = 'pointer';
+    els('*', target).forEach(ch => { if (!ch.style.pointerEvents) ch.style.pointerEvents = 'auto'; });
+    target.addEventListener('mouseenter', () => target.dataset._oldFill = target.getAttribute('fill'));
+    target.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      renderCountry(iso);
+      target.setAttribute('fill', '#34d399');
       setTimeout(()=>{
-        if(node.dataset._oldFill) node.setAttribute('fill', node.dataset._oldFill);
-        else node.removeAttribute('fill');
+        if(target.dataset._oldFill) target.setAttribute('fill', target.dataset._oldFill);
+        else target.removeAttribute('fill');
       }, 220);
     });
-  });
 
-  // Color countries that have data
-  clickable.forEach(node => {
-    if(state.data[node.id]?.length){
-      node.setAttribute('data-has-data', 'true');
-      if(!node.getAttribute('fill')) node.setAttribute('fill', '#0b3b48');
+    // Tint if data exists
+    if(state.data[iso]?.length){
+      target.setAttribute('data-has-data', 'true');
+      if(!target.getAttribute('fill')) target.setAttribute('fill', '#0b3b48');
     }
   });
 }
