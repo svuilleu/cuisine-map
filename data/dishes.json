@@ -1,0 +1,49 @@
+{
+  "FR": [
+    {
+      "name": "Bouillabaisse",
+      "description": "Soupe de poissons originaire de Marseille, servie avec rouille et croûtons.",
+      "images": [
+        "images/fr-bouillabaisse.jpg"
+      ],
+      "tags": [
+        "poisson",
+        "soupe"
+      ]
+    },
+    {
+      "name": "Crêpes",
+      "description": "Pâte fine dorée à la poêle, garnie sucrée ou salée.",
+      "images": [
+        "images/fr-crepes.jpg"
+      ],
+      "tags": [
+        "sucré",
+        "salé"
+      ]
+    }
+  ],
+  "JP": [
+    {
+      "name": "Ramen",
+      "description": "Nouilles dans un bouillon (shoyu, miso, tonkotsu…), garnies d’œuf et chashu.",
+      "images": [
+        "images/jp-ramen.jpg"
+      ],
+      "tags": [
+        "nouilles"
+      ]
+    },
+    {
+      "name": "Sushi",
+      "description": "Riz vinaigré accompagné de poisson cru ou autres garnitures.",
+      "images": [
+        "images/jp-sushi.jpg"
+      ],
+      "tags": [
+        "poisson",
+        "riz"
+      ]
+    }
+  ]
+}

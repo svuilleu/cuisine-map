@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cuisine Map – Démo (Solution 1)</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1>🍽️ Cuisine Map</h1>
+    <p>Clique un pays pour voir ses plats traditionnels. (Démo sans base de données, données = fichiers.)</p>
+  </header>
+
+  <main class="layout">
+    <section class="map-panel">
+      <div id="map-container" aria-label="Carte du monde cliquable" role="img">
+        <!-- La carte SVG sera injectée ici -->
+        <div class="map-loading" id="map-loading">Chargement de la carte…</div>
+      </div>
+      <div class="legend">
+        <span class="legend-item"><span class="dot has-data"></span>Pays avec plats</span>
+        <span class="legend-item"><span class="dot no-data"></span>Pays sans données (pour l’instant)</span>
+      </div>
+    </section>
+
+    <aside class="details-panel" id="details">
+      <div class="placeholder">
+        <h2>Bienvenue 👋</h2>
+        <p>Sélectionne un pays sur la carte pour afficher ses plats.</p>
+        <p class="hint">Tu peux éditer <code>data/dishes.json</code> et ajouter tes images dans <code>/images</code>.</p>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="site-footer">
+    <p>Projet statique – hébergeable sur GitHub Pages / Netlify. Aucune base de données : tout est dans les fichiers.</p>
+  </footer>
+
+  <script src="assets/app.js" type="module"></script>
+</body>
+</html>
