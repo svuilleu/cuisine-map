@@ -15,10 +15,11 @@ Tout est **statique** : fichiers HTML/CSS/JS + `data/dishes.json` pour les donn�
   style.css
 /data
   dishes.json
+  countries.json
 /images
   (tes images ici)
 /public
-  world-simple-demo.svg   # carte de démonstration (quelques pays seulement)
+  world-simple.svg       # remplace par une vraie carte ISO-2
 index.html
 ```
 
@@ -39,23 +40,274 @@ index.html
 }
 ```
 
-## Remplacer la carte (optionnel mais recommandé)
-- Remplace `public/world-simple-demo.svg` par une **vraie carte du monde simplifiée** où
-  chaque pays a un `id` = **code ISO-2** (FR, JP, BR…).
-- Garde le même nom de fichier (`world-simple-demo.svg`) ou adapte l’URL dans `assets/app.js`.
-
-**Astuce** : dans le SVG, si chaque `<g id="FR">` contient un `<title>France</title>`, le nom
-du pays s’affichera automatiquement dans le panneau latéral.
-
 ## Déploiement (GitHub Pages)
 1. Crée un dépôt sur GitHub et pousse tous ces fichiers à la racine.
 2. Paramètres du repo → **Pages** → Source: **Main / root** → Enregistrer.
 3. Ton site sera accessible à une URL du type `https://toncompte.github.io/tonrepo/`.
 
-## Déploiement (Netlify, alternatif)
-- Glisse-dépose le dossier dans Netlify → il crée une URL. Aucun build nécessaire.
 
-## Aller plus loin
-- Recherche par plat, filtres (tags).
-- Segmentation des données par pays (`data/countries/FR.json`, etc.) + script d’agrégation.
-- Interface d’édition (Decap CMS) tout en restant “sans base de données” (option 2).
+## Carte du monde (Option A – Simple SVG World Map)
+
+- Télécharge une **carte SVG** où chaque pays a un `id` = **code ISO-2** (ex: `FR`, `JP`).
+- Renomme le fichier en **`world-simple.svg`** et place-le dans le dossier `public/`.
+- C’est tout : l’application la chargera automatiquement.
+
+> Astuce : si le SVG contient un `<title>France</title>` à l’intérieur de chaque pays, le nom s’affiche joliment dans le panneau. Sinon, on utilise le mapping de `data/countries.json`.
+
+## Liste des pays et abréviations (ISO 3166-1 alpha-2)
+
+Cette application se base sur les **codes ISO-2** (deux lettres). Tu trouveras ci-dessous la liste complète.
+> Remarque : **XK** (Kosovo) est inclus à titre d'usage courant (non-officiel ISO).
+
+| Code | Pays |
+|---|---|
+| AF | Afghanistan |
+| AX | Åland Islands |
+| AL | Albania |
+| DZ | Algeria |
+| AS | American Samoa |
+| AD | Andorra |
+| AO | Angola |
+| AI | Anguilla |
+| AQ | Antarctica |
+| AG | Antigua and Barbuda |
+| AR | Argentina |
+| AM | Armenia |
+| AW | Aruba |
+| AU | Australia |
+| AT | Austria |
+| AZ | Azerbaijan |
+| BS | Bahamas |
+| BH | Bahrain |
+| BD | Bangladesh |
+| BB | Barbados |
+| BY | Belarus |
+| BE | Belgium |
+| BZ | Belize |
+| BJ | Benin |
+| BM | Bermuda |
+| BT | Bhutan |
+| BO | Bolivia (Plurinational State of) |
+| BQ | Bonaire, Sint Eustatius and Saba |
+| BA | Bosnia and Herzegovina |
+| BW | Botswana |
+| BV | Bouvet Island |
+| BR | Brazil |
+| IO | British Indian Ocean Territory |
+| BN | Brunei Darussalam |
+| BG | Bulgaria |
+| BF | Burkina Faso |
+| BI | Burundi |
+| CV | Cabo Verde |
+| KH | Cambodia |
+| CM | Cameroon |
+| CA | Canada |
+| KY | Cayman Islands |
+| CF | Central African Republic |
+| TD | Chad |
+| CL | Chile |
+| CN | China |
+| CX | Christmas Island |
+| CC | Cocos (Keeling) Islands |
+| CO | Colombia |
+| KM | Comoros |
+| CG | Congo |
+| CD | Congo, Democratic Republic of the |
+| CK | Cook Islands |
+| CR | Costa Rica |
+| CI | Côte d'Ivoire |
+| HR | Croatia |
+| CU | Cuba |
+| CW | Curaçao |
+| CY | Cyprus |
+| CZ | Czechia |
+| DK | Denmark |
+| DJ | Djibouti |
+| DM | Dominica |
+| DO | Dominican Republic |
+| EC | Ecuador |
+| EG | Egypt |
+| SV | El Salvador |
+| GQ | Equatorial Guinea |
+| ER | Eritrea |
+| EE | Estonia |
+| SZ | Eswatini |
+| ET | Ethiopia |
+| FK | Falkland Islands (Malvinas) |
+| FO | Faroe Islands |
+| FJ | Fiji |
+| FI | Finland |
+| FR | France |
+| GF | French Guiana |
+| PF | French Polynesia |
+| TF | French Southern Territories |
+| GA | Gabon |
+| GM | Gambia |
+| GE | Georgia |
+| DE | Germany |
+| GH | Ghana |
+| GI | Gibraltar |
+| GR | Greece |
+| GL | Greenland |
+| GD | Grenada |
+| GP | Guadeloupe |
+| GU | Guam |
+| GT | Guatemala |
+| GG | Guernsey |
+| GN | Guinea |
+| GW | Guinea-Bissau |
+| GY | Guyana |
+| HT | Haiti |
+| HM | Heard Island and McDonald Islands |
+| VA | Holy See |
+| HN | Honduras |
+| HK | Hong Kong |
+| HU | Hungary |
+| IS | Iceland |
+| IN | India |
+| ID | Indonesia |
+| IR | Iran (Islamic Republic of) |
+| IQ | Iraq |
+| IE | Ireland |
+| IM | Isle of Man |
+| IL | Israel |
+| IT | Italy |
+| JM | Jamaica |
+| JP | Japan |
+| JE | Jersey |
+| JO | Jordan |
+| KZ | Kazakhstan |
+| KE | Kenya |
+| KI | Kiribati |
+| KP | Korea (Democratic People's Republic of) |
+| KR | Korea, Republic of |
+| KW | Kuwait |
+| KG | Kyrgyzstan |
+| LA | Lao People's Democratic Republic |
+| LV | Latvia |
+| LB | Lebanon |
+| LS | Lesotho |
+| LR | Liberia |
+| LY | Libya |
+| LI | Liechtenstein |
+| LT | Lithuania |
+| LU | Luxembourg |
+| MO | Macao |
+| MG | Madagascar |
+| MW | Malawi |
+| MY | Malaysia |
+| MV | Maldives |
+| ML | Mali |
+| MT | Malta |
+| MH | Marshall Islands |
+| MQ | Martinique |
+| MR | Mauritania |
+| MU | Mauritius |
+| YT | Mayotte |
+| MX | Mexico |
+| FM | Micronesia (Federated States of) |
+| MD | Moldova, Republic of |
+| MC | Monaco |
+| MN | Mongolia |
+| ME | Montenegro |
+| MS | Montserrat |
+| MA | Morocco |
+| MZ | Mozambique |
+| MM | Myanmar |
+| NA | Namibia |
+| NR | Nauru |
+| NP | Nepal |
+| NL | Netherlands |
+| NC | New Caledonia |
+| NZ | New Zealand |
+| NI | Nicaragua |
+| NE | Niger |
+| NG | Nigeria |
+| NU | Niue |
+| NF | Norfolk Island |
+| MK | North Macedonia |
+| MP | Northern Mariana Islands |
+| NO | Norway |
+| OM | Oman |
+| PK | Pakistan |
+| PW | Palau |
+| PS | Palestine, State of |
+| PA | Panama |
+| PG | Papua New Guinea |
+| PY | Paraguay |
+| PE | Peru |
+| PH | Philippines |
+| PN | Pitcairn |
+| PL | Poland |
+| PT | Portugal |
+| PR | Puerto Rico |
+| QA | Qatar |
+| RE | Réunion |
+| RO | Romania |
+| RU | Russian Federation |
+| RW | Rwanda |
+| BL | Saint Barthélemy |
+| SH | Saint Helena, Ascension and Tristan da Cunha |
+| KN | Saint Kitts and Nevis |
+| LC | Saint Lucia |
+| MF | Saint Martin (French part) |
+| PM | Saint Pierre and Miquelon |
+| VC | Saint Vincent and the Grenadines |
+| WS | Samoa |
+| SM | San Marino |
+| ST | Sao Tome and Principe |
+| SA | Saudi Arabia |
+| SN | Senegal |
+| RS | Serbia |
+| SC | Seychelles |
+| SL | Sierra Leone |
+| SG | Singapore |
+| SX | Sint Maarten (Dutch part) |
+| SK | Slovakia |
+| SI | Slovenia |
+| SB | Solomon Islands |
+| SO | Somalia |
+| ZA | South Africa |
+| GS | South Georgia and the South Sandwich Islands |
+| SS | South Sudan |
+| ES | Spain |
+| LK | Sri Lanka |
+| SD | Sudan |
+| SR | Suriname |
+| SJ | Svalbard and Jan Mayen |
+| SE | Sweden |
+| CH | Switzerland |
+| SY | Syrian Arab Republic |
+| TW | Taiwan, Province of China |
+| TJ | Tajikistan |
+| TZ | Tanzania, United Republic of |
+| TH | Thailand |
+| TL | Timor-Leste |
+| TG | Togo |
+| TK | Tokelau |
+| TO | Tonga |
+| TT | Trinidad and Tobago |
+| TN | Tunisia |
+| TR | Türkiye |
+| TM | Turkmenistan |
+| TC | Turks and Caicos Islands |
+| TV | Tuvalu |
+| UG | Uganda |
+| UA | Ukraine |
+| AE | United Arab Emirates |
+| GB | United Kingdom of Great Britain and Northern Ireland |
+| UM | United States Minor Outlying Islands |
+| US | United States of America |
+| UY | Uruguay |
+| UZ | Uzbekistan |
+| VU | Vanuatu |
+| VE | Venezuela (Bolivarian Republic of) |
+| VN | Viet Nam |
+| VG | Virgin Islands (British) |
+| VI | Virgin Islands (U.S.) |
+| WF | Wallis and Futuna |
+| EH | Western Sahara |
+| YE | Yemen |
+| ZM | Zambia |
+| ZW | Zimbabwe |
+| XK | Kosovo |

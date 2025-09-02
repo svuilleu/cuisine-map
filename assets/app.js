@@ -1,7 +1,7 @@
 // Simple app – no framework
 const state = {
   data: {},
-  codeToName: {}, // optional mapping (filled from SVG titles when available)
+  codeToName: {}, // mapping ISO2 -> label (from countries.json or SVG titles)
 };
 
 const el = (sel, root=document) => root.querySelector(sel);
@@ -85,7 +85,7 @@ function resetDetails(){
 }
 
 function wireCountryClicks(svg){
-  // Use any path (or element) with an id that looks like an ISO2 code (A–Z)
+  // Use any element with an id that looks like an ISO2 code (A–Z)
   const clickable = els('[id]', svg).filter(n => /^[A-Z]{2}$/.test(n.id));
 
   // Fill mapping from <title> of each path/group if present
@@ -112,7 +112,6 @@ function wireCountryClicks(svg){
   clickable.forEach(node => {
     if(state.data[node.id]?.length){
       node.setAttribute('data-has-data', 'true');
-      // Optional: subtle tint (do not override existing fill if present)
       if(!node.getAttribute('fill')) node.setAttribute('fill', '#0b3b48');
     }
   });
@@ -120,17 +119,20 @@ function wireCountryClicks(svg){
 
 async function main(){
   try{
-    const [data] = await Promise.all([
-      loadJSON('data/dishes.json')
+    const [data, names] = await Promise.all([
+      loadJSON('data/dishes.json'),
+      loadJSON('data/countries.json')
     ]);
     state.data = data;
+    state.codeToName = { ...state.codeToName, ...names };
 
-    const svg = await injectSVG('public/world-simple-demo.svg', el('#map-container'));
+    const svg = await injectSVG('public/world-simple.svg', el('#map-container'));
     el('#map-loading')?.remove();
     if(svg) wireCountryClicks(svg);
   }catch(err){
     console.error(err);
-    el('#map-loading').textContent = "Erreur de chargement. Vérifie les fichiers.";
+    const ml = el('#map-loading');
+    if(ml) ml.textContent = "Erreur de chargement. Vérifie les fichiers.";
   }
 }
 
