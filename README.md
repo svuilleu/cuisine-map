@@ -1,313 +1,132 @@
-# Cuisine Map – Solution 1 (sans base de données)
+# 🍽️ Cuisine Map — README
 
-Projet minimal pour afficher des **plats traditionnels par pays** via une **carte SVG cliquable**.
-Tout est **statique** : fichiers HTML/CSS/JS + `data/dishes.json` pour les données + images.
+**But du projet**  
+Créer une petite application web **sans base de données** qui affiche des **plats traditionnels par pays** à partir d’une **carte du monde cliquable (SVG)**.  
+Un élève peut **ajouter/modifier** les plats et les images **simplement** en éditant des **fichiers** (`data/dishes.json`, dossier `images/`).
 
-## Lancer en local (deux possibilités)
-- Ouvrir `index.html` dans un navigateur **via un petit serveur** (important pour `fetch()`):
-  - Python : `python3 -m http.server` puis ouvre http://localhost:8000
-  - Node : `npx serve .`
+- 📦 Dépôt source : **https://github.com/svuilleu/cuisine-map**  
+- 🌐 Démo en ligne : **https://svuilleu.github.io/cuisine-map/**
 
-## Structure
+---
+
+## 🔎 Comment ça marche (vue d’ensemble)
+
+- **Carte** : `public/world-simple.svg` — chaque pays expose un code **ISO-2** via `id="FR"` (ou `data-id="FR"`).  
+- **Données** : `data/dishes.json` joue le rôle d’une **“base de données” de fichiers**.  
+- **Noms pays** : `data/countries.json` (mapping `ISO2 → Nom`).  
+- **Logique** : `assets/app.js` charge le SVG + JSON, rend les pays **cliquables**, et affiche les plats.  
+- **Styles** : `assets/style.css` gère couleurs et contours (les pays avec des plats ont un **contour** discret).
+
 ```
 /assets
   app.js
   style.css
 /data
-  dishes.json
-  countries.json
+  dishes.json       # “stockage” des plats par pays
+  countries.json    # noms des pays (ISO2 → nom)
 /images
-  (tes images ici)
+  (vos images ici)
 /public
-  world-simple.svg
+  world-simple.svg  # carte du monde (SVG cliquable)
 index.html
 ```
 
-## Édition des données
-- Ouvre `data/dishes.json` et ajoute/édite les plats.
-- La clé de pays est le **code ISO-2** (ex: `FR`, `JP`, `BR`…).
-- Exemple :
-```json
+---
+
+## 🧩 `dishes.json` = “base de données” (fichiers)
+
+Exemple minimal :
+
+```jsonc
 {
   "FR": [
     {
-      "name": "Bouillabaisse",
-      "description": "Soupe de poissons…",
-      "images": ["images/fr-bouillabaisse.jpg"],
-      "tags": ["poisson"]
+      "name": "Crêpes",
+      "description": "Fine pâte dorée, sucrée/salée.",
+      "images": ["fr-crepes.jpg"],  // ⬅️ le code préfixe automatiquement 'images/'
+      "tags": ["sucré", "salé"]
+    }
+  ],
+  "BR": [
+    {
+      "name": "Feijoada",
+      "description": "Ragoût de haricots noirs et de viande, servi avec du riz.",
+      "images": ["br-feijoada.jpg"],
+      "tags": ["haricots", "viande"]
     }
   ]
 }
 ```
 
-## Déploiement (GitHub Pages)
-1. Crée un dépôt sur GitHub et pousse tous ces fichiers à la racine.
-2. Paramètres du repo → **Pages** → Source: **Main / root** → Enregistrer.
-3. Ton site sera accessible à une URL du type `https://toncompte.github.io/tonrepo/`.
+Rappels :
+- Clé de pays = **ISO-2** (ex. `FR`, `JP`), identique au code de la carte.
+- Dans `images`, **le nom de fichier seul** suffit (`"fr-crepes.jpg"`).  
+  Les chemins `images/...`, `/images/...`, URL `http(s)`, `data:` sont aussi acceptées.
+- JSON **valide** requis (virgules, crochets).
 
+---
 
-## Carte du monde (Option A – Simple SVG World Map)
+## ⚡️ Quickstart (local) — 30 secondes
 
-- Télécharge une **carte SVG** où chaque pays a un `id` = **code ISO-2** (ex: `FR`, `JP`).
-- Renomme le fichier en **`world-simple.svg`** et place-le dans le dossier `public/`.
-- C’est tout : l’application la chargera automatiquement.
+```bash
+# 1) Cloner (ou télécharger le ZIP) puis ouvrir un petit serveur
+git clone https://github.com/svuilleu/cuisine-map.git
+cd cuisine-map
+python3 -m http.server 8000   # ou: npx serve .
+# Ouvrir http://localhost:8000
+```
 
-> Astuce : si le SVG contient un `<title>France</title>` à l’intérieur de chaque pays, le nom s’affiche joliment dans le panneau. Sinon, on utilise le mapping de `data/countries.json`.
+- Ajouter un plat : éditez `data/dishes.json` et déposez l’image dans `/images`.
+- Tester : rafraîchissez la page, cliquez le pays → le plat apparaît.
 
-## Liste des pays et abréviations (ISO 3166-1 alpha-2)
+> 🧭 Pour un **pas-à-pas détaillé** (création de compte GitHub, GitHub Pages, Git/GitHub Desktop…), voir **[GUIDE_Installation_&_Deploiement.md](./GUIDE_Installation_&_Deploiement.md)**.
 
-Cette application se base sur les **codes ISO-2** (deux lettres). Tu trouveras ci-dessous la liste complète.
-> Remarque : **XK** (Kosovo) est inclus à titre d'usage courant (non-officiel ISO).
+---
 
-| Code | Pays |
-|---|---|
-| AF | Afghanistan |
-| AX | Åland Islands |
-| AL | Albania |
-| DZ | Algeria |
-| AS | American Samoa |
-| AD | Andorra |
-| AO | Angola |
-| AI | Anguilla |
-| AQ | Antarctica |
-| AG | Antigua and Barbuda |
-| AR | Argentina |
-| AM | Armenia |
-| AW | Aruba |
-| AU | Australia |
-| AT | Austria |
-| AZ | Azerbaijan |
-| BS | Bahamas |
-| BH | Bahrain |
-| BD | Bangladesh |
-| BB | Barbados |
-| BY | Belarus |
-| BE | Belgium |
-| BZ | Belize |
-| BJ | Benin |
-| BM | Bermuda |
-| BT | Bhutan |
-| BO | Bolivia (Plurinational State of) |
-| BQ | Bonaire, Sint Eustatius and Saba |
-| BA | Bosnia and Herzegovina |
-| BW | Botswana |
-| BV | Bouvet Island |
-| BR | Brazil |
-| IO | British Indian Ocean Territory |
-| BN | Brunei Darussalam |
-| BG | Bulgaria |
-| BF | Burkina Faso |
-| BI | Burundi |
-| CV | Cabo Verde |
-| KH | Cambodia |
-| CM | Cameroon |
-| CA | Canada |
-| KY | Cayman Islands |
-| CF | Central African Republic |
-| TD | Chad |
-| CL | Chile |
-| CN | China |
-| CX | Christmas Island |
-| CC | Cocos (Keeling) Islands |
-| CO | Colombia |
-| KM | Comoros |
-| CG | Congo |
-| CD | Congo, Democratic Republic of the |
-| CK | Cook Islands |
-| CR | Costa Rica |
-| CI | Côte d'Ivoire |
-| HR | Croatia |
-| CU | Cuba |
-| CW | Curaçao |
-| CY | Cyprus |
-| CZ | Czechia |
-| DK | Denmark |
-| DJ | Djibouti |
-| DM | Dominica |
-| DO | Dominican Republic |
-| EC | Ecuador |
-| EG | Egypt |
-| SV | El Salvador |
-| GQ | Equatorial Guinea |
-| ER | Eritrea |
-| EE | Estonia |
-| SZ | Eswatini |
-| ET | Ethiopia |
-| FK | Falkland Islands (Malvinas) |
-| FO | Faroe Islands |
-| FJ | Fiji |
-| FI | Finland |
-| FR | France |
-| GF | French Guiana |
-| PF | French Polynesia |
-| TF | French Southern Territories |
-| GA | Gabon |
-| GM | Gambia |
-| GE | Georgia |
-| DE | Germany |
-| GH | Ghana |
-| GI | Gibraltar |
-| GR | Greece |
-| GL | Greenland |
-| GD | Grenada |
-| GP | Guadeloupe |
-| GU | Guam |
-| GT | Guatemala |
-| GG | Guernsey |
-| GN | Guinea |
-| GW | Guinea-Bissau |
-| GY | Guyana |
-| HT | Haiti |
-| HM | Heard Island and McDonald Islands |
-| VA | Holy See |
-| HN | Honduras |
-| HK | Hong Kong |
-| HU | Hungary |
-| IS | Iceland |
-| IN | India |
-| ID | Indonesia |
-| IR | Iran (Islamic Republic of) |
-| IQ | Iraq |
-| IE | Ireland |
-| IM | Isle of Man |
-| IL | Israel |
-| IT | Italy |
-| JM | Jamaica |
-| JP | Japan |
-| JE | Jersey |
-| JO | Jordan |
-| KZ | Kazakhstan |
-| KE | Kenya |
-| KI | Kiribati |
-| KP | Korea (Democratic People's Republic of) |
-| KR | Korea, Republic of |
-| KW | Kuwait |
-| KG | Kyrgyzstan |
-| LA | Lao People's Democratic Republic |
-| LV | Latvia |
-| LB | Lebanon |
-| LS | Lesotho |
-| LR | Liberia |
-| LY | Libya |
-| LI | Liechtenstein |
-| LT | Lithuania |
-| LU | Luxembourg |
-| MO | Macao |
-| MG | Madagascar |
-| MW | Malawi |
-| MY | Malaysia |
-| MV | Maldives |
-| ML | Mali |
-| MT | Malta |
-| MH | Marshall Islands |
-| MQ | Martinique |
-| MR | Mauritania |
-| MU | Mauritius |
-| YT | Mayotte |
-| MX | Mexico |
-| FM | Micronesia (Federated States of) |
-| MD | Moldova, Republic of |
-| MC | Monaco |
-| MN | Mongolia |
-| ME | Montenegro |
-| MS | Montserrat |
-| MA | Morocco |
-| MZ | Mozambique |
-| MM | Myanmar |
-| NA | Namibia |
-| NR | Nauru |
-| NP | Nepal |
-| NL | Netherlands |
-| NC | New Caledonia |
-| NZ | New Zealand |
-| NI | Nicaragua |
-| NE | Niger |
-| NG | Nigeria |
-| NU | Niue |
-| NF | Norfolk Island |
-| MK | North Macedonia |
-| MP | Northern Mariana Islands |
-| NO | Norway |
-| OM | Oman |
-| PK | Pakistan |
-| PW | Palau |
-| PS | Palestine, State of |
-| PA | Panama |
-| PG | Papua New Guinea |
-| PY | Paraguay |
-| PE | Peru |
-| PH | Philippines |
-| PN | Pitcairn |
-| PL | Poland |
-| PT | Portugal |
-| PR | Puerto Rico |
-| QA | Qatar |
-| RE | Réunion |
-| RO | Romania |
-| RU | Russian Federation |
-| RW | Rwanda |
-| BL | Saint Barthélemy |
-| SH | Saint Helena, Ascension and Tristan da Cunha |
-| KN | Saint Kitts and Nevis |
-| LC | Saint Lucia |
-| MF | Saint Martin (French part) |
-| PM | Saint Pierre and Miquelon |
-| VC | Saint Vincent and the Grenadines |
-| WS | Samoa |
-| SM | San Marino |
-| ST | Sao Tome and Principe |
-| SA | Saudi Arabia |
-| SN | Senegal |
-| RS | Serbia |
-| SC | Seychelles |
-| SL | Sierra Leone |
-| SG | Singapore |
-| SX | Sint Maarten (Dutch part) |
-| SK | Slovakia |
-| SI | Slovenia |
-| SB | Solomon Islands |
-| SO | Somalia |
-| ZA | South Africa |
-| GS | South Georgia and the South Sandwich Islands |
-| SS | South Sudan |
-| ES | Spain |
-| LK | Sri Lanka |
-| SD | Sudan |
-| SR | Suriname |
-| SJ | Svalbard and Jan Mayen |
-| SE | Sweden |
-| CH | Switzerland |
-| SY | Syrian Arab Republic |
-| TW | Taiwan, Province of China |
-| TJ | Tajikistan |
-| TZ | Tanzania, United Republic of |
-| TH | Thailand |
-| TL | Timor-Leste |
-| TG | Togo |
-| TK | Tokelau |
-| TO | Tonga |
-| TT | Trinidad and Tobago |
-| TN | Tunisia |
-| TR | Türkiye |
-| TM | Turkmenistan |
-| TC | Turks and Caicos Islands |
-| TV | Tuvalu |
-| UG | Uganda |
-| UA | Ukraine |
-| AE | United Arab Emirates |
-| GB | United Kingdom of Great Britain and Northern Ireland |
-| UM | United States Minor Outlying Islands |
-| US | United States of America |
-| UY | Uruguay |
-| UZ | Uzbekistan |
-| VU | Vanuatu |
-| VE | Venezuela (Bolivarian Republic of) |
-| VN | Viet Nam |
-| VG | Virgin Islands (British) |
-| VI | Virgin Islands (U.S.) |
-| WF | Wallis and Futuna |
-| EH | Western Sahara |
-| YE | Yemen |
-| ZM | Zambia |
-| ZW | Zimbabwe |
-| XK | Kosovo |
+## 🚀 Déployer (résumé)
+
+1. Pousser tous les fichiers à la **racine** du dépôt (`index.html`, `assets/`, `data/`, `public/`, `images/`).  
+2. **Settings → Pages** → *Deploy from a branch* → `main` + `/ (root)` → **Save**.  
+3. Votre site sera accessible (ex.) : `https://svuilleu.github.io/cuisine-map/`.
+
+> Détails complets dans **[GUIDE_Installation_&_Deploiement.md](./GUIDE_Installation_&_Deploiement.md)**.
+
+---
+
+## 🌱 Apprendre Git & GitHub (très bref)
+
+```bash
+git clone https://github.com/svuilleu/cuisine-map.git
+cd cuisine-map
+git checkout -b feature/mon-changement
+# ... modifs ...
+git add .
+git commit -m "Mon amélioration"
+git push -u origin feature/mon-changement
+```
+- Ouvrir ensuite une **Pull Request** sur GitHub.  
+- Pour **Forker** : bouton **Fork** sur le dépôt → clonez votre propre copie.  
+- Voir le mémo complet dans le **GUIDE**.
+
+---
+
+## 🛣️ Roadmap & améliorations possibles
+
+- **Validation automatique** : script & GitHub Action pour vérifier `dishes.json` (JSON valide, clés ISO-2 connues) et contrôler l’SVG (présence d’IDs ISO-2).  
+- **Recherche & filtres** : par plat, tag, pays.  
+- **Accessibilité** : focus clavier, aria-live sur le panneau de résultats.  
+- **Mobile** : gestuelle (tap/zoom), hitbox plus généreuses.  
+- **Thèmes** : variables CSS (clair/sombre), palette daltonisme-friendly.  
+- **i18n** : noms de pays multilingues, UI en FR/EN.  
+- **PWA** (offline) : cache des fichiers statiques pour usage sans connexion.  
+- **CMS “sans back-end”** : intégration **Decap CMS** pour éditer `dishes.json` et images dans GitHub (interface web).  
+- **Contrib** : fichiers `LICENSE`, `CONTRIBUTING.md`, modèles d’issues/PR, Code of Conduct.
+
+---
+
+## 🧪 Dépannage rapide
+- **Un pays ne clique pas** : la carte doit exposer `id="FR"` ou `data-id="FR"` / `data-iso2="FR"`.  
+- **Couleur** : le CSS fixe la couleur de base ; les pays avec plats ont un **contour**.  
+- **Erreur JSON** : validez la syntaxe (virgules, crochets).
+
+Bon apprentissage & bon appétit ! 😋
